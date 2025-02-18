@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { InputAdornment } from '@mui/material';
 import { ProductCreationFormProps } from '../../../entities/product/interfaces/ProductCreationFormProps';
 import {
@@ -13,8 +13,8 @@ import {
     ImageCaption
 } from './product-creation.styles';
 
-const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loading }) => {
-    const [formData, setFormData] = useState({
+const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loading, productToEdit }) => {
+    const initialFormData = {
         title: '',
         description: '',
         image: null as File | null,
@@ -22,27 +22,38 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
         imagePreview: '',
         price: undefined as number | undefined,
         priceInput: ''
-    });
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
     const [error, setError] = useState('');
 
-    const handleReset = () => {
-        setFormData({
-            title: '',
-            description: '',
-            image: null,
-            imageName: '',
-            imagePreview: '',
-            price: undefined,
-            priceInput: ''
-        });
+    useEffect(() => {
+        if (productToEdit) {
+            setFormData({
+                title: productToEdit.title,
+                description: productToEdit.description,
+                image: null,
+                imageName: productToEdit.imageName || '',
+                imagePreview: productToEdit.image || '',
+                price: productToEdit.price,
+                priceInput: productToEdit.price ? productToEdit.price.toString() : ''
+            });
+        } else {
+            setFormData(initialFormData);
+        }
+    }, [productToEdit]);
+
+    const resetForm = () => {
+        setFormData(initialFormData);
         setError('');
     };
 
     const validateForm = () => {
-        if (!formData.title) return '! Product name is required';
-        if (formData.price === undefined || formData.price <= 0) return '! Price is required';
-        if (!formData.image) return '! Image is required';
-        return '';
+        const errors = [];
+        if (!formData.title) errors.push('! Product name is required');
+        if (formData.price === undefined || formData.price <= 0) errors.push('! Price is required');
+        if (!formData.image && !productToEdit) errors.push('! Image is required');
+        return errors.join(' ');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,41 +64,33 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
             return;
         }
 
-        if (formData.image) {
-            const imageUrl = URL.createObjectURL(formData.image);
-            await onSubmit({
-                ...formData,
-                image: imageUrl,
-                price: formData.price
-            });
-            handleReset();
-        }
+        const imageUrl = formData.image ? URL.createObjectURL(formData.image) : productToEdit?.image;
+
+        await onSubmit({
+            ...formData,
+            image: imageUrl
+        });
+        resetForm();
     };
 
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     }, []);
 
-    const handleImageChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const file = event.target.files?.[0];
-            if (file) {
-                setFormData(prev => ({
-                    ...prev,
-                    image: file,
-                    imagePreview: URL.createObjectURL(file),
-                    imageName: file.name
-                }));
-            } else {
-                handleReset();
-            }
-        },
-        [handleReset]
-    );
+    const handleImageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setFormData(prev => ({
+                ...prev,
+                image: file,
+                imagePreview: URL.createObjectURL(file),
+                imageName: file.name
+            }));
+        } else {
+            resetForm();
+        }
+    }, []);
 
     const handlePriceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/ /g, '.');
@@ -107,6 +110,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
                 <StyledTextField
                     label='Product name'
                     variant='outlined'
+                    name='title'
                     value={formData.title}
                     onChange={handleChange}
                     fullWidth
@@ -115,6 +119,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
                 <StyledTextField
                     label='Description'
                     variant='outlined'
+                    name='description'
                     value={formData.description}
                     onChange={handleChange}
                     fullWidth
@@ -124,6 +129,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
                 <StyledTextField
                     label='Price'
                     variant='outlined'
+                    name='priceInput'
                     value={formData.priceInput}
                     onChange={handlePriceChange}
                     fullWidth
@@ -155,7 +161,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({ onSubmit, loa
             </div>
             <StyledContainer>
                 <StyledButton variant='contained' type='submit' disabled={loading}>
-                    {loading ? 'Creating...' : 'Create'}
+                    {loading ? 'Creating...' : productToEdit ? 'Update' : 'Create'}
                 </StyledButton>
             </StyledContainer>
         </form>

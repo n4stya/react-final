@@ -1,12 +1,14 @@
 import styled from 'styled-components';
-import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 
 export const CardContainer = styled.div`
     display: flex;
     align-items: center;
     border-radius: 23px;
     padding: 16px;
-    margin: 15px auto;
+    margin: 0 auto 15px auto;
     background-color: #ffffff;
     max-width: 900px;
     flex-direction: row;
@@ -38,9 +40,29 @@ export const Price = styled.p`
     text-align: center;
 `;
 
-export const DeleteButton = styled(DeleteRoundedIcon)`
+export const EditIcon = styled(EditRoundedIcon)`
     && {
-        color: #bebebe;
+        color: #868686;
+        cursor: pointer;
+        position: absolute;
+        top: 14px;
+        right: 44px;
+    }
+`;
+
+export const AddToCartIcon = styled(AddShoppingCartRoundedIcon)`
+    && {
+        color: #868686;
+        cursor: pointer;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+    }
+`;
+
+export const AddedToCartIcon = styled(ShoppingCartRoundedIcon)`
+    && {
+        color: #fd6c52;
         cursor: pointer;
         position: absolute;
         top: 14px;

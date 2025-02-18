@@ -2,6 +2,7 @@
     "name": "my-app",
     "version": "0.1.0",
     "private": true,
+    "homepage": "https://n4stya.github.io/react-final",
     "overrides": {
         "react-scripts": {
             "@svgr/webpack": "8.1.0",
@@ -31,7 +32,9 @@
         "eject": "react-scripts eject",
         "lint": "eslint ./src --ext .ts,.tsx",
         "lint:fix": "npm run lint -- --fix",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build"
     },
     "eslintConfig": {
         "extends": [
@@ -60,6 +63,7 @@
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-jsx-a11y": "^6.10.2",
         "eslint-plugin-prettier": "^5.2.3",
+        "gh-pages": "^6.3.0",
         "husky": "^8.0.0",
         "lint-staged": "^15.4.3",
         "prettier": "^3.4.2"

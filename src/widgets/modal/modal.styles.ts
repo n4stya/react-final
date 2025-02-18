@@ -27,6 +27,7 @@ export const ModalContainer = styled.div`
 export const CloseIcon = styled(ReactComponent)`
     margin-right: 20px;
     color: #868686;
+    cursor: pointer;
 `;
 
 export const Header = styled.div`

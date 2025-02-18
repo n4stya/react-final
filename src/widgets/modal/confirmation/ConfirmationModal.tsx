@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {
     ModalOverlay,
     ModalContainer,
@@ -14,13 +13,10 @@ import {
 import { ConfirmationModalProps } from '../../../entities/product/interfaces/ConfirmationModalProps';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, onConfirm, onCancel, message, visible }) => {
-    const modalRoot = document.getElementById('modal-root');
-
-    if (!modalRoot || !visible) {
+    if (!visible) {
         return null;
     }
-
-    return ReactDOM.createPortal(
+    return (
         <ModalOverlay>
             <ModalContainer>
                 <Title>{title}</Title>
@@ -34,8 +30,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, onConfirm,
                     </CancelButton>
                 </ButtonContainer>
             </ModalContainer>
-        </ModalOverlay>,
-        modalRoot
+        </ModalOverlay>
     );
 };
 

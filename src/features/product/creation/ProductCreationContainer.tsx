@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import Modal from '../../../widgets/modal/Modal';
 import CreateButton from '../../../shared/buttons/create-button/CreateButton';
 import ProductCreationForm from './ProductCreationForm';
@@ -6,43 +6,52 @@ import { ProductModel } from '../../../entities/product/models/product.model';
 import { useDispatch } from 'react-redux';
 import { createProductApi } from '../../../shared/services/product-api.service';
 import { addProductAction } from '../../../shared/store/product/product.slice';
+import { ProductCreationContainerProps } from '../../../entities/product/interfaces/ProductCreationContainerProps';
 
-const ProductCreationContainer: React.FC = () => {
+const ProductCreationContainer: React.FC<ProductCreationContainerProps> = ({
+    productToEdit,
+    onSubmit,
+    isOpen,
+    onClose,
+    onOpenCreateModal
+}) => {
     const dispatch = useDispatch();
-    const [modalVisible, setModalVisible] = useState(false);
-
-    const handleModalOpen = useCallback(() => setModalVisible(true), []);
-    const handleModalClose = useCallback(() => {
-        setModalVisible(false);
-    }, []);
 
     const handleSubmit = useCallback(
         async (productData: Partial<ProductModel>) => {
             try {
-                const newProduct = {
-                    ...productData,
-                    id: Date.now(),
-                    title: productData.title || '',
-                    price: productData.price ?? 0,
-                    description: productData.description || '',
-                    category: productData.category || '',
-                    image: productData.image || ''
-                };
-                await createProductApi(newProduct);
-                dispatch(addProductAction(newProduct));
-                handleModalClose();
+                if (productToEdit) {
+                    const updatedProduct = {
+                        ...productToEdit,
+                        ...productData
+                    };
+                    await onSubmit(updatedProduct);
+                } else {
+                    const newProduct = {
+                        ...productData,
+                        id: Date.now(),
+                        title: productData.title || '',
+                        price: productData.price ?? 0,
+                        description: productData.description || '',
+                        category: productData.category || '',
+                        image: productData.image || ''
+                    };
+                    await createProductApi(newProduct);
+                    dispatch(addProductAction(newProduct));
+                }
+                onClose();
             } catch (error) {
-                console.error('Error creating product:', error);
+                console.error('Error creating or updating product:', error);
             }
         },
-        [dispatch, handleModalClose]
+        [dispatch, productToEdit, onSubmit, onClose]
     );
 
     return (
         <>
-            <CreateButton onClick={handleModalOpen} />
-            <Modal visible={modalVisible} onClose={handleModalClose}>
-                <ProductCreationForm onSubmit={handleSubmit} />
+            <CreateButton onClick={onOpenCreateModal} />
+            <Modal visible={isOpen} onClose={onClose} modalTitle={productToEdit ? 'Update product' : 'Create product'}>
+                <ProductCreationForm onSubmit={handleSubmit} productToEdit={productToEdit} />
             </Modal>
         </>
     );
