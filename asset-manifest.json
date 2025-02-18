@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/react-final/static/js/main.907fd5fa.js",
+    "main.js": "/react-final/static/js/main.d3bde47a.js",
     "index.html": "/react-final/index.html",
     "static/media/cross.svg": "/react-final/static/media/cross.92be7c3d1999432ffb13b5ff289bcf5e.svg",
-    "main.907fd5fa.js.map": "/react-final/static/js/main.907fd5fa.js.map"
+    "main.d3bde47a.js.map": "/react-final/static/js/main.d3bde47a.js.map"
   },
   "entrypoints": [
-    "static/js/main.907fd5fa.js"
+    "static/js/main.d3bde47a.js"
   ]
 }
